@@ -95,6 +95,9 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 			float fAppendedTime;
 			D3DXCOLOR aColor[CHAT_LINE_COLOR_ARRAY_MAX_NUM];
 			CGraphicTextInstance Instance;
+			#ifdef ENABLE_GLOBAL_CHAT
+			CGraphicImageInstance* ImageInstance;
+			#endif
 
 			SChatLine();
 			virtual ~SChatLine();

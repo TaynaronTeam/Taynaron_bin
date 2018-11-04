@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "PythonChat.h"
 
 #include "AbstractApplication.h"
@@ -137,6 +137,10 @@ void CPythonChat::UpdateViewMode(DWORD dwID)
 		pChatLine->Instance.SetPosition(pChatSet->m_ix, pChatSet->m_iy + iHeight);
 		pChatLine->Instance.SetColor(rColor);
 		pChatLine->Instance.Update();
+		#ifdef ENABLE_GLOBAL_CHAT
+		if (pChatLine->ImageInstance)
+			pChatLine->ImageInstance->SetPosition(pChatSet->m_ix, pChatSet->m_iy + iHeight + 2);
+		#endif
 	}
 }
 
@@ -178,6 +182,10 @@ void CPythonChat::UpdateEditMode(DWORD dwID)
 		pChatLine->Instance.SetPosition(pChatSet->m_ix, pChatSet->m_iy + iHeight);
 		pChatLine->Instance.SetColor(rColor);
 		pChatLine->Instance.Update();
+		#ifdef ENABLE_GLOBAL_CHAT
+		if (pChatLine->ImageInstance)
+			pChatLine->ImageInstance->SetPosition(pChatSet->m_ix, pChatSet->m_iy + iHeight + 2);
+		#endif
 	}
 }
 
@@ -198,6 +206,10 @@ void CPythonChat::UpdateLogMode(DWORD dwID)
 		pChatLine->Instance.SetPosition(pChatSet->m_ix, pChatSet->m_iy + iHeight);
 		pChatLine->Instance.SetColor(pChatLine->GetColorRef(dwID));
 		pChatLine->Instance.Update();
+		#ifdef ENABLE_GLOBAL_CHAT
+		if (pChatLine->ImageInstance)
+			pChatLine->ImageInstance->SetPosition(pChatSet->m_ix, pChatSet->m_iy + iHeight + 2);
+		#endif
 	}
 }
 
@@ -248,6 +260,11 @@ void CPythonChat::Render(DWORD dwID)
 	{
 		CGraphicTextInstance & rInstance = (*itor)->Instance;
 		rInstance.Render();
+		#ifdef ENABLE_GLOBAL_CHAT
+		CGraphicImageInstance *& imInstance = (*itor)->ImageInstance;
+		if (imInstance)
+			imInstance->Render();
+		#endif
 	}
 }
 
@@ -474,7 +491,7 @@ void CPythonChat::AppendChat(int iType, const char * c_szChat)
 		TChatSet * pChatSet = &(itor->second);
 		//pChatLine->SetColor(itor->first, GetChatColor(iType));
 
-		// Edit Mode ¸¦ ¾ïÁö·Î ³¢¿ö ¸ÂÃß±â À§ÇØ Ãß°¡
+		// Edit Mode Â¸Â¦ Ä¾ÄÃÃ¶Â·Ã Å‚Ë˜Å¼Ã¶ Â¸Ã‚Ä‚ÃŸÂ±Ã¢ Å”Â§Ã‡Å˜ Ä‚ÃŸÂ°Ë‡
 		if (BOARD_STATE_EDIT == pChatSet->m_iBoardState)
 		{
 			ArrangeShowingChat(itor->first);
@@ -488,6 +505,78 @@ void CPythonChat::AppendChat(int iType, const char * c_szChat)
 			}
 		}
 	}
+#ifdef ENABLE_GLOBAL_CHAT
+	std::string const s = c_szChat;
+	std::size_t EP1 = 0;
+	std::size_t EP2 = 0;
+	std::size_t EP3 = 0;
+
+	CGraphicImageInstance *& prFlag = pChatLine->ImageInstance;
+
+	std::string sub_s = s.substr(0, 1);
+	if (iType == 6) {
+		EP1 = sub_s.find_first_of("1");
+		EP2 = sub_s.find_first_of("2");
+		EP3 = sub_s.find_first_of("3");
+	}
+	else {
+		EP1 = sub_s.find("!à¸¢à¸‡$%&/(845945)=X");
+		EP2 = sub_s.find("!à¸¢à¸‡$%&/(845945)=X");
+		EP3 = sub_s.find("!à¸¢à¸‡$%&/(845945)=X");
+	}
+
+	if (EP1 != std::string::npos) {
+
+		if (CResourceManager::Instance().IsFileExist("d:/ymir work/ui/game/flag/shinsoo.tga"))
+		{
+			CGraphicImage * pFlagImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/ui/game/flag/shinsoo.tga");
+			if (pFlagImage)
+			{
+				prFlag = CGraphicImageInstance::New();
+				prFlag->SetImagePointer(pFlagImage);
+			}
+		}
+	}
+
+	else if (EP2 != std::string::npos) {
+
+		if (CResourceManager::Instance().IsFileExist("d:/ymir work/ui/game/flag/chunjo.tga"))
+		{
+			CGraphicImage * pFlagImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/ui/game/flag/chunjo.tga");
+			if (pFlagImage)
+			{
+				prFlag = CGraphicImageInstance::New();
+				prFlag->SetImagePointer(pFlagImage);
+			}
+		}
+	}
+
+	else if (EP3 != std::string::npos) {
+
+		if (CResourceManager::Instance().IsFileExist("d:/ymir work/ui/game/flag/jinno.tga"))
+		{
+			CGraphicImage * pFlagImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/ui/game/flag/jinno.tga");
+			if (pFlagImage)
+			{
+				prFlag = CGraphicImageInstance::New();
+				prFlag->SetImagePointer(pFlagImage);
+			}
+		}
+	}
+
+	else {
+
+		if (CResourceManager::Instance().IsFileExist("d:/ymir work/ui/game/flag/none.tga"))
+		{
+			CGraphicImage * pFlagImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/ui/game/flag/none.tga");
+			if (pFlagImage)
+			{
+				prFlag = CGraphicImageInstance::New();
+				prFlag->SetImagePointer(pFlagImage);
+			}
+		}
+	}
+#endif
 }
 
 void CPythonChat::AppendChatWithDelay(int iType, const char * c_szChat, int iDelay)
@@ -512,12 +601,12 @@ DWORD CPythonChat::GetChatColor(int iType)
 void CPythonChat::IgnoreCharacter(const char * c_szName)
 {
 	TIgnoreCharacterSet::iterator itor = m_IgnoreCharacterSet.find(c_szName);
-	// NOTE : ÀÌ¹Ì Â÷´Ü ÁßÀÌ¶ó¸é..
+	// NOTE : Å”ÄšÄ…Äš Ã‚Ã·Â´Ãœ ÃÃŸÅ”ÄšÂ¶Ã³Â¸Ã©..
 	if (m_IgnoreCharacterSet.end() != itor)
 	{
 		m_IgnoreCharacterSet.erase(itor);
 	}
-	// NOTE : Â÷´ÜÀÌ µÇÁö ¾ÊÀº Ä³¸¯ÅÍ¶ó¸é..
+	// NOTE : Ã‚Ã·Â´ÃœÅ”Äš ÂµÃ‡ÃÃ¶ Ä¾Ä˜Å”ÅŸ Ã„Å‚Â¸Å»Ä¹ÃÂ¶Ã³Â¸Ã©..
 	else
 	{
 		m_IgnoreCharacterSet.insert(c_szName);
