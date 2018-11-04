@@ -78,8 +78,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Distribute|Win32'">
     <OutDir>.\Distribute\</OutDir>
     <IntDir>.\Distribute\</IntDir>
-    <IncludePath>C:\Users\XaiMeS\Taynaron_bin\extern\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\XaiMeS\Taynaron_bin\extern\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
